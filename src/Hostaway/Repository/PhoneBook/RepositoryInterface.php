@@ -11,10 +11,12 @@ interface RepositoryInterface
 {
     /**
      * @param string|null $filter
+     * @param int|null $offset
+     * @param int|null $limit
      *
      * @return PhoneBook[]|[]
      */
-    public function getListByFilter(?string $filter): array;
+    public function getListByFilter(?string $filter, ?int $offset, ?int $limit): array;
 
     /**
      * @param int $id

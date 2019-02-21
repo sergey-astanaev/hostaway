@@ -42,8 +42,10 @@ class GetListHandler
     public function handle(Request $request): Response
     {
         $filter = $request->get('first_name');
+        $offset = $request->get('offset');
+        $limit = $request->get('limit');
         try {
-            $phoneBookList = $this->repository->getListByFilter($filter);
+            $phoneBookList = $this->repository->getListByFilter($filter, $offset, $limit);
 
             return $this->response
                 ->successful(

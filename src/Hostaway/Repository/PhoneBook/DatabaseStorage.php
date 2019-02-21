@@ -30,11 +30,9 @@ class DatabaseStorage implements RepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getListByFilter(?string $filter): array
+    public function getListByFilter(?string $filter, ?int $offset, ?int $limit): array
     {
-        return $filter === null
-            ? $this->repository->findAll()
-            : $this->findByFirstName($filter);
+        return $this->findByFirstName($filter ?? '', $offset, $limit);
     }
 
     /**
@@ -42,11 +40,13 @@ class DatabaseStorage implements RepositoryInterface
      *
      * @return array
      */
-    private function findByFirstName(string $filter): array
+    private function findByFirstName(string $filter, ?int $offset, ?int $limit): array
     {
         return $this->repository->createQueryBuilder('pb')
             ->andWhere('pb.firstName LIKE :firstName')
             ->setParameter('firstName', $filter . '%')
+            ->setFirstResult($offset ?? 0)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
