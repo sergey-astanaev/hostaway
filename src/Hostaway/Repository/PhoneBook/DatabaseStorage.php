@@ -28,7 +28,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getListByFilter(?string $filter, ?int $offset, ?int $limit): array
     {
@@ -52,7 +52,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getItemById(int $id): PhoneBook
     {
@@ -66,7 +66,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function insertItem(PhoneBookDTO $phoneBookDTO): PhoneBook
     {
@@ -85,7 +85,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function updateItem(PhoneBookDTO $phoneBookDTO, PhoneBook $phoneBook): void
     {
@@ -97,7 +97,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function removeItem(PhoneBook $phoneBook): void
     {
@@ -107,7 +107,7 @@ class DatabaseStorage implements RepositoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function assemblePhoneBookDTO(PhoneBook $phoneBook, PhoneBookDTO $phoneBookDTO)
     {

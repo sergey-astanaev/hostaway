@@ -19,7 +19,7 @@ class ConstrainsTimezoneValidator extends ConstraintValidator
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

@@ -25,7 +25,7 @@ class HostawayConnector implements HostawayConnectorInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCountryCodeList(): array
     {
@@ -33,7 +33,7 @@ class HostawayConnector implements HostawayConnectorInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTimeZoneList(): array
     {

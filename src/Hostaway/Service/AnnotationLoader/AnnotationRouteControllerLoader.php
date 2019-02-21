@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Route;
 class AnnotationRouteControllerLoader extends AnnotationClassLoader
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
     {

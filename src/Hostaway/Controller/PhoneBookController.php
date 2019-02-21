@@ -36,7 +36,7 @@ class PhoneBookController extends AbstractController
      *
      * @throws \Exception
      *
-     * @Route(path="/{phone}", methods={"GET"})
+     * @Route(path="/{phone}", methods={"GET"}, requirements={"phone"="\d+"})
      */
     public function getItem(Request $request, int $phone): Response
     {
@@ -69,7 +69,7 @@ class PhoneBookController extends AbstractController
      *
      * @throws \Exception
      *
-     * @Route(path="/{phone}", methods={"PUT"})
+     * @Route(path="/{phone}", methods={"PUT"}, requirements={"phone"="\d+"})
      */
     public function updateItem(Request $request, int $phone): JsonResponse
     {

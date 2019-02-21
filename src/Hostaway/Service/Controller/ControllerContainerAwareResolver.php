@@ -27,7 +27,7 @@ class ControllerContainerAwareResolver implements ControllerResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getController(Request $request)
     {

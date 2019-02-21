@@ -14,7 +14,7 @@ abstract class AbstractController implements ContainerAwareInterface
     private $container;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
