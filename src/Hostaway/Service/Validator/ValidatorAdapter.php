@@ -54,7 +54,7 @@ class ValidatorAdapter
      */
     public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null): ConstraintViolationListInterface
     {
-        return $this->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
+        return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }
 
 
