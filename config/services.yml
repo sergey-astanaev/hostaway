@@ -1,0 +1,205 @@
+imports:
+    - { resource: parameters.yml }
+services:
+    logger:
+        class: Symfony\Component\HttpKernel\Log\Logger
+        arguments:
+            - '%logger.min_level%'
+            - '%logger.path%'
+
+    file.locator:
+        class: Symfony\Component\Config\FileLocator
+
+    annotation.cache:
+        class: Doctrine\Common\Cache\PhpFileCache
+        arguments:
+            - '%annotation.cache.dir%'
+
+    annotation.common.reader:
+        class: Doctrine\Common\Annotations\AnnotationReader
+
+    annotation.file.cache.reader:
+        class: Doctrine\Common\Annotations\CachedReader
+        arguments:
+            - '@annotation.common.reader'
+            - '@annotation.cache'
+
+    annotation.route.controller.loader:
+        class: Hostaway\Service\AnnotationLoader\AnnotationRouteControllerLoader
+        arguments:
+            - '@annotation.file.cache.reader'
+
+    annotation.directory.controller.loader:
+        class: Symfony\Component\Routing\Loader\AnnotationDirectoryLoader
+        arguments:
+            - '@file.locator'
+            - '@annotation.route.controller.loader'
+
+    annotation.route.matcher:
+        class: Symfony\Component\Routing\Router
+        arguments:
+            - '@annotation.directory.controller.loader'
+            - '%annotation.controller.dir%'
+            - []
+            - '@route.request.context'
+            - '@logger'
+
+    request.stack:
+        class: Symfony\Component\HttpFoundation\RequestStack
+
+    route.request.context:
+        class: Symfony\Component\Routing\RequestContext
+
+    symfony.component.http_kernel.event_listener.router_listener:
+        class: Symfony\Component\HttpKernel\EventListener\RouterListener
+        arguments:
+            - '@annotation.route.matcher'
+            - '@request.stack'
+            - '@route.request.context'
+
+    repository.phone_book.database_storage:
+        class: Hostaway\Repository\PhoneBook\DatabaseStorage
+        arguments:
+            - '@phone_book.repository'
+            - '@doctrine.entity_manager'
+
+    service.response.json.restful_response:
+        class: Hostaway\Service\Response\JSON\RestfulResponse
+
+    service.request_handler.phone_book.get_item_handler:
+        class: Hostaway\Service\RequestHandler\PhoneBook\GetItemHandler
+        arguments:
+            - '@repository.phone_book.database_storage'
+            - '@serializer'
+            - '@service.response.json.restful_response'
+
+    service.request_handler.phone_book.get_list_handler:
+        class: Hostaway\Service\RequestHandler\PhoneBook\GetListHandler
+        arguments:
+            - '@repository.phone_book.database_storage'
+            - '@serializer'
+            - '@service.response.json.restful_response'
+
+    service.request_handler.phone_book.post_handler:
+        class: Hostaway\Service\RequestHandler\PhoneBook\PostHandler
+        arguments:
+            - '@service.serializer.json_serializer'
+            - '@service.validator.validator_adapter'
+            - '@repository.phone_book.database_storage'
+            - '@service.response.json.restful_response'
+
+    service.request_handler.phone_book.put_handler:
+        class: Hostaway\Service\RequestHandler\PhoneBook\PutHandler
+        arguments:
+            - '@service.serializer.json_serializer'
+            - '@service.validator.validator_adapter'
+            - '@repository.phone_book.database_storage'
+            - '@service.response.json.restful_response'
+
+    service.request_handler.phone_book.delete_item_handler:
+        class: Hostaway\Service\RequestHandler\PhoneBook\DeleteItemHandler
+        arguments:
+            - '@repository.phone_book.database_storage'
+            - '@service.response.json.restful_response'
+
+    service.validator.validator_adapter:
+        class: Hostaway\Service\Validator\ValidatorAdapter
+        arguments: ['@validator']
+
+    http.kernel.event.dispatcher:
+        class: Symfony\Component\EventDispatcher\EventDispatcher
+        calls:
+            - [addSubscriber, ['@symfony.component.http_kernel.event_listener.router_listener']]
+
+    http.kernel.controller.resolver:
+        class: Symfony\Component\HttpKernel\Controller\ControllerResolver
+
+    controller.controller_container_aware_resolver:
+        class: Hostaway\Service\Controller\ControllerContainerAwareResolver
+        arguments: ['@http.kernel.controller.resolver', '@service_container']
+
+    http.kernel.controller.argument.resolver:
+        class: Symfony\Component\HttpKernel\Controller\ArgumentResolver
+
+    http.kernel:
+        class: Symfony\Component\HttpKernel\HttpKernel
+        arguments:
+            - '@http.kernel.event.dispatcher'
+            - '@controller.controller_container_aware_resolver'
+            - '@request.stack'
+            - '@http.kernel.controller.argument.resolver'
+
+    Doctrine\ORM\Tools\Setup:
+        class: Doctrine\ORM\Tools\Setup
+
+    Doctrine\Common\Cache\ArrayCache:
+        class: Doctrine\Common\Cache\ArrayCache
+
+    doctrine.annotation.metadata.configuration:
+        class: Doctrine\ORM\Configuration
+        factory: 'Doctrine\ORM\Tools\Setup:createAnnotationMetadataConfiguration'
+        arguments:
+            - '%doctrine.entity.paths%'
+            - '%doctrine.annotation.metadata.is_dev_mode%'
+            - null
+            - '@Doctrine\Common\Cache\ArrayCache'
+            - false
+
+    doctrine.entity_manager:
+        class: Doctrine\ORM\EntityManager
+        factory: 'Doctrine\ORM\EntityManager::create'
+        arguments:
+            - '%doctrine.database%'
+            - '@doctrine.annotation.metadata.configuration'
+
+    Symfony\Component\Serializer\Normalizer\ObjectNormalizer:
+        class: Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+
+    Symfony\Component\Serializer\Encoder\JsonEncoder:
+        class: Symfony\Component\Serializer\Encoder\JsonEncoder
+
+    serializer:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            - ['@Symfony\Component\Serializer\Normalizer\ObjectNormalizer']
+            - ['@Symfony\Component\Serializer\Encoder\JsonEncoder']
+
+    service.serializer.json_serializer:
+        class: Hostaway\Service\Serializer\JsonSerializer
+        arguments: ['@serializer']
+
+    validator.container_constraint_validator_factory:
+        class: Symfony\Component\Validator\ContainerConstraintValidatorFactory
+        arguments: ['@service_container']
+
+    validator.builder:
+        class: Symfony\Component\Validator\ValidatorBuilder
+        calls:
+            - [enableAnnotationMapping]
+            - [setConstraintValidatorFactory, ['@validator.container_constraint_validator_factory']]
+
+    validator:
+        class: Symfony\Component\Validator\Validator\ValidatorInterface
+        factory: ['@validator.builder', getValidator]
+
+    phone_book.repository:
+        class: Doctrine\Common\Persistence\ObjectRepository
+        factory: ['@doctrine.entity_manager', getRepository]
+        arguments:
+            - Hostaway\Entity\PhoneBook
+
+    hostaway.connector.hostaway_connector:
+        class: Hostaway\Service\Connector\HostawayConnector
+        arguments: ['%hostaway.api.base_url%']
+
+    Hostaway\Validator\Constraints\ConstrainsUniquePhoneNumberValidator:
+        class: Hostaway\Validator\Constraints\ConstrainsUniquePhoneNumberValidator
+        arguments: ['@phone_book.repository']
+
+    Hostaway\Validator\Constraints\ConstrainsCountryCodeValidator:
+        class: Hostaway\Validator\Constraints\ConstrainsCountryCodeValidator
+        arguments: ['@hostaway.connector.hostaway_connector']
+
+    Hostaway\Validator\Constraints\ConstrainsTimezoneValidator:
+        class: Hostaway\Validator\Constraints\ConstrainsTimezoneValidator
+        arguments: ['@hostaway.connector.hostaway_connector']

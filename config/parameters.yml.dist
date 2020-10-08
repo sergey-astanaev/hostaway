@@ -1,0 +1,17 @@
+parameters:
+  project.dir: null
+  annotation.cache.dir: '%project.dir%/var/cache'
+  annotation.controller.dir: '%project.dir%/src/Hostaway/Controller'
+
+  logger.path: '%project.dir%/var/logs/error.log'
+  logger.min_level: 'debug'
+
+  doctrine.entity.paths: ['%project.dir%/src/Hostaway/Entity']
+  doctrine.annotation.metadata.is_dev_mode: false
+  doctrine.database:
+    driver: 'pdo_mysql'
+    user: null
+    password: null
+    dbname: null
+
+  hostaway.api.base_url: 'https://api.hostaway.com'

@@ -1,0 +1,24 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Hostaway\\": "src/Hostaway"
+        }
+    },
+    "require": {
+        "symfony/http-kernel": "^4.2",
+        "symfony/routing": "^4.2",
+        "doctrine/annotations": "^1.6",
+        "doctrine/cache": "^1.8",
+        "symfony/dependency-injection": "^4.2",
+        "symfony/config": "^4.2",
+        "symfony/yaml": "^4.2",
+        "symfony/validator": "^4.2",
+        "doctrine/migrations": "^2.0",
+        "doctrine/orm": "2.6",
+        "symfony/serializer": "^4.2",
+        "symfony/property-access": "^4.2",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "require-dev": {
+    }
+}
